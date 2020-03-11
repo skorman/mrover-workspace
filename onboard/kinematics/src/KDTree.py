@@ -14,6 +14,9 @@ class KDTree:
             beta = float(row[4])
             gamma = float(row[5])
 
+            left = int(row[6])
+            right = int(row[7])
+
     
     def traverse_tree(self):
         pass
