@@ -1,0 +1,24 @@
+{
+    "preloads": {
+        "pick_up_front_rover": {
+            "angles": {
+                "joint_a": 0,
+                "joint_b": 0,
+                "joint_c": 0,
+                "joint_d": 0,
+                "joint_e": 0,
+                "joint_f": 0
+            }
+        },
+        "test_preload": {
+            "angles": {
+                "joint_a": 0,
+                "joint_b": 1.5707,
+                "joint_c": 0,
+                "joint_d": 0.1234,
+                "joint_e": 0,
+                "joint_f": 0
+            }
+        }
+    }
+}

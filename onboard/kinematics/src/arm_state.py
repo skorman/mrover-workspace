@@ -16,9 +16,10 @@ class ArmState:
         angle : joint angles -- always changing during operation
 
     '''
-    def __init__(self, geom):
+    def __init__(self, geom, preloads):
         super(ArmState, self).__init__()
         self.geom = geom
+        self.preloads = preloads
         self.angles = OrderedDict()
         self.angle_time = 0
         self.prev_angles = OrderedDict()
@@ -264,6 +265,18 @@ class ArmState:
         self.angles['joint_f'] = arm_position[5]
         # TODO: add time tracking
         self.angle_time = time.time()
+
+    def get_preload_angles(self, preload):
+        angles = self.preloads['preloads'][preload]
+
+        joint_a = angles['joint_a']
+        joint_b = angles['joint_b']
+        joint_c = angles['joint_c']
+        joint_d = angles['joint_d']
+        joint_e = angles['joint_e']
+        joint_f = angles['joint_f']
+        
+        return [joint_a, joint_b, joint_c, joint_d, joint_e, joint_f]
 
     def transform_parts(self):
         transformed_parts = []

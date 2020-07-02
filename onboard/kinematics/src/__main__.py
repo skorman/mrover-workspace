@@ -11,9 +11,11 @@ from rover_common import aiolcm
 def main():
     config_path = os.environ['MROVER_CONFIG']
     geom_file = config_path + '/config_kinematics/mrover_arm_geom.json'
+    preload_file = config_path + '/config_kinematics/preload_positions.json'
     sa_geom_file = config_path + '/config_kinematics/mrover_sa_geom.json'
     args = {
         'geom_file': geom_file,
+        'preload_file': preload_file,
     }
     lcm_ = aiolcm.AsyncLCM()
 
@@ -46,6 +48,7 @@ def main():
     lcm_.subscribe("/motion_execute", arm.motion_execute_callback)
     lcm_.subscribe("/simulation_mode", arm.simulation_mode_callback)
     lcm_.subscribe("/ik_arm_control", arm.cartesian_control_callback)
+    lcm_.subscribe("/ra_preload_position", arm.preload_position_callback)
     # lcm_.subscribe("/lock_joint_e", arm.lock_e_callback)
     lcm_.subscribe("/ik_enabled", arm.ik_enabled_callback)
     lcm_.subscribe("/sa_depositpos_trig", sa.execute_callback)

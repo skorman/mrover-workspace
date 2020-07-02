@@ -1,0 +1,5 @@
+package rover_msgs;
+
+struct PreloadCmd {
+    string preload_name;
+}

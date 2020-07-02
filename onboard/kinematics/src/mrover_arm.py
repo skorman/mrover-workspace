@@ -4,7 +4,7 @@ from collections import OrderedDict
 from rover_msgs import (FKTransform, ArmPosition, DebugMessage,
                         TargetOrientation, TargetAngles, MotionExecute,
                         SimulationMode, IkArmControl, LockJointE,
-                        IkEnabled)
+                        IkEnabled, PreloadCmd)
 import numpy as np
 from numpy import linalg as LA
 import asyncio
@@ -20,10 +20,11 @@ class MRoverArm:
         self.config = config
 
         geom = self.read_geometry_from_JSON()
+        preloads = self.read_preloads_from_JSON()
 
         # shared global variable between different modules
         self.lcm_ = lcm
-        self.state = ArmState(geom)
+        self.state = ArmState(geom, preloads)
 
         self.solver = KinematicsSolver(self.state, lcm)
         self.motion_planner = MotionPlanner(self.state, lcm, self.solver)
@@ -42,6 +43,14 @@ class MRoverArm:
             geom = json.load(f, object_pairs_hook=OrderedDict)
 
         return geom
+
+    def read_preloads_from_JSON(self):
+        preload_file = self.config['preload_file']
+
+        with open(preload_file) as f:
+            preloads = json.load(f, object_pairs_hook=OrderedDict)
+
+        return preloads
 
     def arm_position_callback(self, channel, msg):
         """
@@ -172,6 +181,13 @@ class MRoverArm:
             self.preview()
         else:
             self.enable_execute = True
+
+    def preload_position_callback(self, channel, msg):
+        preload_name = PreloadCmd.decode(msg)
+
+        goal = self.state.get_preload_angles()
+
+        self.plan_path(goal)
 
     def sa_set_spline(self, spline):
         self.current_spline = spline
