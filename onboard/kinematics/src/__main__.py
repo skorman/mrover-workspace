@@ -97,5 +97,6 @@ def main():
     lcm_.subscribe("/ik_arm_control", arm.cartesian_control_callback)
     lcm_.subscribe("/lock_joint_e", arm.lock_e_callback)
     lcm_.subscribe("/ik_enabled", arm.ik_enabled_callback)
+    lcm_.subscribe("/autonomous_arm", arm.autonomous_arm_callback)
 
     run_coroutines(lcm_.loop(), arm.execute_spline())

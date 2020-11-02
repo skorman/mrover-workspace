@@ -79,6 +79,51 @@ class MRoverArm:
         self.lcm_.publish('/fk_transform', tm.encode())
         return None
 
+    def autonomous_arm_callback(self, channel, msg):
+        print("autonomous arm callback")
+        point_msg = AutonomousArm.decode(msg)
+
+        if not point_msg.teleop:
+            return
+
+        self.enable_execute = False
+
+        use_orientation = False
+        point = np.array([point_msg.x, point_msg.y, point_msg.z, 0, 0, 0])
+
+        success = False
+        joint_angles, success = self.solver.IK(point, False, use_orientation)
+
+        ik_message = DebugMessage()
+        ik_message.isError = False
+
+        for i in range(5):
+            if success:
+                ik_message.message = "Solved IK"
+                break
+            print("attempting new IK solution...")
+            print(i)
+            joint_angles, success = self.solver.IK(point, True, use_orientation)
+
+        if not success:
+            ik_message.message = "No IK solution"
+            logger.warning('No IK solution found...')
+            print("NO IK SOLUTION FOUND, please try a different configuration...")
+
+        self.lcm_.publish('/debugMessage', ik_message.encode())
+        if not success:
+            return
+
+        self.publish_transforms(self.state)
+        goal = [joint_angles["joint_a"],
+                joint_angles["joint_b"],
+                joint_angles["joint_c"],
+                joint_angles["joint_d"],
+                joint_angles["joint_e"],
+                joint_angles["joint_f"]]
+        self.plan_path(goal)
+        
+
     def target_orientation_callback(self, channel, msg):
         print("target orientation callback")
         point_msg = TargetOrientation.decode(msg)
